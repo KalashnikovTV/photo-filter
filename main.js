@@ -1,4 +1,3 @@
-
 // Add active class to the current button
 const header = document.querySelector(".btn-container");
 const btns = header.querySelectorAll(".btn");
@@ -11,11 +10,12 @@ btns.forEach(btn => btn.addEventListener('click', function() {
 
 // Filters: blur, invert, sepia, saturate, hue
 const inputs = document.querySelectorAll('.filters input');
+const imageCurrent = document.querySelector('.image-current');
 const btnReset = document.querySelector('.btn-reset');
 
 function handleUpdate() {
     const suffix = this.dataset.sizing || '';
-    document.documentElement.style.setProperty(`--${this.name}`, this.value + suffix);
+    imageCurrent.style.setProperty(`--${this.name}`, this.value + suffix);
 
     const outputs = this.nextElementSibling;
     outputs.innerHTML = this.value;
@@ -25,7 +25,7 @@ inputs.forEach(input => input.addEventListener('input', handleUpdate));
 function handleReset() {
     inputs.forEach(input => {
         input.name === 'saturate' ? input.value = 100 : input.value = 0;
-        document.documentElement.style.setProperty(`--${input.name}`, input.value + (input.dataset.sizing || ''));
+        imageCurrent.style.setProperty(`--${input.name}`, input.value + (input.dataset.sizing || ''));
 
         const outputs = input.nextElementSibling;
         outputs.innerHTML = input.value;
@@ -35,24 +35,22 @@ btnReset.addEventListener('click', handleReset);
 
 // Next picture
 const hour = new Date().getHours();
-const imageCurrent = document.querySelector('.image-current');
 const btnNextPicture = document.querySelector('.btn-next');
-let basePath = 'assets/images/';
+let basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
 
 function nextPicture() {
     if (hour >= 6 && hour < 12) {
-        basePath = 'assets/images/morning/';
+        basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/morning/';
     } else if (hour >= 12 && hour < 18) {
-        basePath = 'assets/images/day/';
+        basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/day/';
     } else if (hour >= 18 && hour < 24) {
-        basePath = 'assets/images/evening/';
+        basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/evening/';
     } else {
-        basePath = 'assets/images/night/';
+        basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/night/';
     }
 }
-console.log(hour);  // проверить и потом удалить
 
-const imagesList = ['01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
+const imagesList = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
 let i = 0;
 
 function getImage() {
@@ -61,31 +59,90 @@ function getImage() {
     const imageSrc = basePath + imagesList[index];
     imageCurrent.src = imageSrc;
     i++;
-    // Delay
-    /* btnNextImage.disabled = true;
-    setTimeout(function () {
-        btnNextImage.disabled = false
-    }, 250); */
+    // Delay click button
+    btnNextPicture.disabled = true;
+    setTimeout(function() {
+        btnNextPicture.disabled = false;
+    }, 250);
 }
 btnNextPicture.addEventListener('click', getImage);
 
 // Load picture
-const fileInput = document.querySelector('input[type="file"]');
-/* const imageContainer = document.querySelector('.image-current'); */
+function loadPicture() {
+    const fileInput = document.querySelector('input[type="file"]');
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            imageCurrent.src = reader.result;
+        }
+        reader.readAsDataURL(file);
+        // clear input for reload picture(the same)
+        fileInput.value = null;
+    });
+}
+loadPicture();
 
-fileInput.addEventListener('change', function(e) {
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-        /* const img = new Image(); */
-        /* img.src = reader.result; */
-        /* imageContainer.innerHTML = ""; */
-        imageCurrent.src = reader.result
+// Download picture with Canvas API
+const canvas = document.querySelector('canvas');
+const btnSavePicture = document.querySelector('.btn-save');
+
+function getFilters() {
+    let filters = '';
+    let imgFilters = imageCurrent.style.cssText;
+
+    for (let i = 0; i < imgFilters.length; i++) {
+        if (imgFilters[i] === "-" && imgFilters[i - 1] !== "e") {
+            continue;
+        } else {
+            switch (imgFilters[i]) {
+                case ":": 
+                    filters = filters + "(";
+                    break;
+                case ";": 
+                    filters = filters + ")";
+                    break;
+                default: 
+                    filters = filters + imgFilters[i];
+                    break;
+            }
+        }
     }
-    reader.readAsDataURL(file);
-    // clear input for reload picture(the same)
-    fileInput.value = null;
-});
+    
+    return filters;
+}
+
+function createCanvas(img) {
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.filter = getFilters();
+    ctx.drawImage(img, 0, 0);
+}
+
+function downloadPicture() {
+    btnSavePicture.addEventListener('click', () => {
+        const request = new Promise((resolve, reject) => {
+            const img = new Image();
+            img.setAttribute('crossOrigin', 'anonymous');
+            img.src = imageCurrent.src; 
+            img.onload = () => {
+                createCanvas(img);
+                resolve();
+            };
+        });
+        request.then(
+            function createLink() {
+                let link = document.createElement('a');
+                link.download = 'picture.jpg';
+                link.href = canvas.toDataURL();
+                link.click();
+                link.delete;
+            }
+        );
+    });
+}
+downloadPicture();
 
 // Fullscreen mode
 document.querySelector('.fullscreen').addEventListener('click', toggleFullScreen);

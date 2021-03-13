@@ -3,7 +3,7 @@
   --invert: 0%;
   --sepia: 0%;
   --saturate: 100%;
-  --hue: 0deg;
+  --hue-rotate: 0deg;
 }
 
 * {
@@ -177,7 +177,10 @@ img {
   object-fit: contain;
   filter: blur(var(--blur, 0px)) invert(var(--invert, 0%))
     sepia(var(--sepia, 0%)) saturate(var(--saturate, 100%))
-    hue-rotate(var(--hue, 0deg));
+    hue-rotate(var(--hue-rotate, 0deg));
+}
+canvas {
+  display: none;
 }
 .fullscreen {
   position: fixed;
