@@ -144,7 +144,7 @@ function downloadPicture() {
             request.then(
                 function createLink() {
                     let link = document.createElement('a');
-                    link.download = 'picture.jpg';
+                    link.download = 'picture.png';
                     link.href = canvas.toDataURL();
                     link.click();
                     link.delete;
