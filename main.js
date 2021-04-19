@@ -41,29 +41,35 @@ handleFilters();
 
 // Next picture
 function nextPicture() {
-    const hour = new Date().getHours();
     const btnNextPicture = document.querySelector('.btn-next');
-    let basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
+    const basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
 
     function getPicturePath() {
+        const hour = new Date().getHours();
         if (hour >= 6 && hour < 12) {
-            basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/morning/';
+            return basePath + 'morning/';
+            // basePath += 'morning/';
         } else if (hour >= 12 && hour < 18) {
-            basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/day/';
+            return basePath + 'day/';
+            // basePath += 'day/';
         } else if (hour >= 18 && hour < 24) {
-            basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/evening/';
+            return basePath + 'evening/'
+            // basePath += 'evening/';
         } else {
-            basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/night/';
+            return basePath + 'night/'
+            // basePath += 'night/';
         }
     }
+    // getPicturePath();
 
     const imagesList = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
     let i = 0;
 
     function getImage() {
-        getPicturePath();
+        // getPicturePath();
         const index = i % imagesList.length;
-        const imageSrc = basePath + imagesList[index];
+        // const imageSrc = basePath + imagesList[index];
+        const imageSrc = getPicturePath() + imagesList[index];
         imageCurrent.src = imageSrc;
         i++;
         // Delay click button
@@ -132,24 +138,17 @@ function downloadPicture() {
 
     function savePicture() {
         btnSavePicture.addEventListener('click', () => {
-            const request = new Promise((resolve, reject) => {
-                const img = new Image();
-                img.setAttribute('crossOrigin', 'anonymous');
-                img.src = imageCurrent.src; 
-                img.onload = () => {
-                    createCanvas(img);
-                    resolve();
-                };
-            });
-            request.then(
-                function createLink() {
-                    let link = document.createElement('a');
-                    link.download = 'picture.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    link.delete;
-                }
-            );
+            const img = new Image();
+            img.setAttribute('crossOrigin', 'anonymous');
+            img.src = imageCurrent.src; 
+            img.onload = () => {
+                createCanvas(img);
+                let link = document.createElement('a');
+                link.download = 'picture.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                link.delete;
+            };
         });
     }
     savePicture();
