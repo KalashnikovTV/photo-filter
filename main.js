@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     handleFilters();
     
-    // getPicture and nextPicture
+    // getPicture, nextPicture and prevPicture
     function getPicture() {
         const btnNextPicture = document.querySelector('.btn-next');
         const btnPrevPicture = document.querySelector('.btn-prev');
@@ -113,7 +113,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 imageCurrent.src = reader.result;
             }
             reader.readAsDataURL(file);
-            // clear input for reload picture(the same)
             fileInput.value = null;
         });
     }
