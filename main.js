@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // getPicture and nextPicture
     function getPicture() {
         const btnNextPicture = document.querySelector('.btn-next');
+        const btnPrevPicture = document.querySelector('.btn-prev');
         const basePath = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
     
         function getPicturePath() {
@@ -59,20 +60,46 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     
         const imagesList = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg', '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'];
-        let i = 0;
+        let slideIndex = 0;
+        let isUsed = false;
     
         function nextPicture() {
-            const index = i % imagesList.length;
-            const imageSrc = getPicturePath() + imagesList[index];
-            imageCurrent.src = imageSrc;
-            i++;
-            // Delay click button
+            if (!isUsed) {
+                const imageSrc = getPicturePath() + imagesList[slideIndex];
+                imageCurrent.src = imageSrc;
+                isUsed = true;
+            } else {
+                if (slideIndex == imagesList.length - 1) {
+                    slideIndex = 0;
+                } else {
+                    slideIndex++;
+                }
+                const imageSrc = getPicturePath() + imagesList[slideIndex];
+                imageCurrent.src = imageSrc;
+            }
+
             btnNextPicture.disabled = true;
             setTimeout(function() {
                 btnNextPicture.disabled = false;
-            }, 250);
+            }, 100);
         }
         btnNextPicture.addEventListener('click', nextPicture);
+
+        function prevPicture() {
+            if (slideIndex == 0) {
+                slideIndex = imagesList.length - 1;
+            } else {
+                slideIndex--;
+            }
+            const imageSrc = getPicturePath() + imagesList[slideIndex];
+            imageCurrent.src = imageSrc;
+            
+            btnPrevPicture.disabled = true;
+            setTimeout(function() {
+                btnPrevPicture.disabled = false;
+            }, 100);
+        }
+        btnPrevPicture.addEventListener('click', prevPicture);
     }
     getPicture();
     
