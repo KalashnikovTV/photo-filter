@@ -131,16 +131,15 @@ window.addEventListener('DOMContentLoaded', () => {
     
             filterInputs.forEach(input => {
                 if (input.name === 'blur') {
-                    const sizeScalling = Math.ceil(input.value * ((img.width / imageCurrent.width + img.height / imageCurrent.height) / 2));
+                    const sizeScalling = (input.value * ((img.width / imageCurrent.width + img.height / imageCurrent.height) / 2)).toFixed(2);
                     filters += `${input.name}(${sizeScalling}${input.dataset.sizing})`;
                 } else {
                     filters += `${input.name}(${input.value}${input.dataset.sizing})`;
                 }
             });
     
-            console.log(`Filters: ${filters}`);
+            // console.log(`Filters: ${filters}`);
             ctx.filter = filters.trim();
-            // ctx.globalCompositeOperation = "destination-out";
             ctx.drawImage(img, 0, 0);
         }
     
