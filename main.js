@@ -131,9 +131,8 @@ window.addEventListener('DOMContentLoaded', () => {
     
             filterInputs.forEach(input => {
                 if (input.name === 'blur') {
-                    const sizeScalling = input.value * ((img.width / imageCurrent.width + img.height / imageCurrent.height) / 2);
+                    const sizeScalling = Math.ceil(input.value * ((img.width / imageCurrent.width + img.height / imageCurrent.height) / 2));
                     filters += `${input.name}(${sizeScalling}${input.dataset.sizing})`;
-                    console.log(`Blur: ${filters}`);
                 } else {
                     filters += `${input.name}(${input.value}${input.dataset.sizing})`;
                 }
